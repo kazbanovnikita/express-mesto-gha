@@ -8,11 +8,9 @@ const {
 const getUsers = (req, res) => {
   User.find({})
     .then((users) => res.status(200).send(users))
-    .catch((err) => res.status(ERROR_DEFAULT).send({
-      message: 'Internal server error',
-      err: err.message,
-      stack: err.stack,
-    }));
+    .catch((err) => res.status(ERROR_DEFAULT).send(
+      { message: err.message },
+    ));
 };
 
 const getUserById = (req, res) => {
@@ -20,16 +18,15 @@ const getUserById = (req, res) => {
     .orFail(new Error('NotFound'))
     .then((user) => res.status(200).send(user))
     .catch((err) => {
-      if (err.message === 'NotFound') {
+      if (err.name === 'CastError') {
+        res.status(ERROR_INVALID_DATA).send({ message: 'Переданы некорректные данные для запроса пользователя' });
+      } else if (err.message === 'NotFound') {
         res.status(ERROR_NOT_FOUND).send({
-          message: 'User not Found',
+          message: 'Пользователь по указонному id не найден',
         });
       } else {
-        res.status(ERROR_DEFAULT).send({
-          message: 'Internal server error',
-          err: err.message,
-          stack: err.stack,
-        });
+        res.status(ERROR_DEFAULT)
+          .send({ message: err.message });
       }
     });
 };
@@ -37,11 +34,9 @@ const getUserById = (req, res) => {
 const createUser = (req, res) => {
   User.create(req.body)
     .then((user) => res.status(201).send(user))
-    .catch((err) => res.status(500).send({
-      message: 'Internal server error',
-      err: err.message,
-      stack: err.stak,
-    }));
+    .catch((err) => res.status(ERROR_DEFAULT).send(
+      { message: err.massage },
+    ));
 };
 
 const updateUserProfile = (req, res) => {
