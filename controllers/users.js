@@ -34,9 +34,14 @@ const getUserById = (req, res) => {
 const createUser = (req, res) => {
   User.create(req.body)
     .then((user) => res.status(201).send(user))
-    .catch((err) => res.status(ERROR_DEFAULT).send(
-      { message: err.massage },
-    ));
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        res.status(ERROR_INVALID_DATA)
+          .send({ message: 'Переданы некорректные данные при создании пользователя' });
+      } else {
+        res.status(ERROR_DEFAULT).send({ message: err.massage });
+      }
+    });
 };
 
 const updateUserProfile = (req, res) => {
