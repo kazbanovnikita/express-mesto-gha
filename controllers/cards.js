@@ -33,10 +33,10 @@ const deleteCard = (req, res) => {
     .then((deletedCard) => res.send(deletedCard))
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(ERROR_INVALID_DATA).send({ message: err.message });
+        res.status(ERROR_NOT_FOUND).send({ message: err.message });
       } else if (err.message === 'NotFound') {
         res
-          .status(ERROR_NOT_FOUND)
+          .status(ERROR_INVALID_DATA)
           .send({ message: 'Карточка с указанным id не найдена' });
       } else {
         res.status(ERROR_DEFAULT).send({ message: err.message });
