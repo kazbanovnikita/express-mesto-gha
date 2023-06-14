@@ -37,7 +37,7 @@ const createUser = (req, res) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res.status(ERROR_INVALID_DATA)
-          .send({ message: 'Переданы некорректные данные при создании пользователя' });
+          .send({ message: 'Переданы некорректные данные' });
       } else {
         res.status(ERROR_DEFAULT).send({ message: err.massage });
       }

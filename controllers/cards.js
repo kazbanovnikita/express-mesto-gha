@@ -29,7 +29,7 @@ const createCard = (req, res) => {
 const deleteCard = (req, res) => {
   const { cardId } = req.params;
   Card.findByIdAndDelete(cardId)
-    .orFail(new Error() === 'NotFound')
+    .orFail(new Error('NotFound'))
     .then((deletedCard) => res.send(deletedCard))
     .catch((err) => {
       if (err.name === 'CastError') {
