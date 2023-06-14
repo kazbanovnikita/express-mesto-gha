@@ -5,23 +5,25 @@ const {
   ERROR_DEFAULT,
 } = require('../erorrs/erorrs');
 
+const STATUS_OK = 200;
+
 const getCards = (req, res) => {
   Card.find({})
     .populate(['name', 'link'])
     .then((cards) => res.send(cards))
-    .catch((err) => res.status(500).send({ message: err.message }));
+    .catch(() => res.status(ERROR_DEFAULT).send({ message: 'Произошла ошибка на сервере' }));
 };
 
 const createCard = (req, res) => {
   const card = req.body;
   card.owner = req.user._id;
   Card.create(card)
-    .then((cardFromDb) => res.status(201).send(cardFromDb))
+    .then((cardFromDb) => res.status(STATUS_OK).send(cardFromDb))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res.status(ERROR_INVALID_DATA).send({ message: 'Переданы некорректные данные' });
       } else {
-        res.status(ERROR_DEFAULT).send({ message: err.message });
+        res.status(ERROR_DEFAULT).send({ message: 'Произошла ошибка на сервере' });
       }
     });
 };
@@ -39,7 +41,7 @@ const deleteCard = (req, res) => {
           .status(ERROR_NOT_FOUND)
           .send({ message: 'Карточка с указанным id не найдена' });
       } else {
-        res.status(ERROR_DEFAULT).send({ message: err.message });
+        res.status(ERROR_DEFAULT).send({ message: 'Произошла ошибка на сервере' });
       }
     });
 };
@@ -66,7 +68,7 @@ const likeCard = (req, res) => {
           .status(ERROR_NOT_FOUND)
           .send({ message: 'Передан не существующий id карточки' });
       } else {
-        res.status(ERROR_DEFAULT).send({ message: err.message });
+        res.status(ERROR_DEFAULT).send({ message: 'Произошла ошибка на сервере' });
       }
     });
 };
@@ -87,7 +89,7 @@ const disLikeCard = (req, res) => {
           .status(ERROR_NOT_FOUND)
           .send({ message: 'Передан не существующий id карточки' });
       } else {
-        res.status(ERROR_DEFAULT).send({ message: err.message });
+        res.status(ERROR_DEFAULT).send({ message: 'Произошла ошибка на сервере' });
       }
     });
 };
