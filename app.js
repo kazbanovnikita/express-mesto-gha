@@ -24,7 +24,7 @@ app.use('/*', (req, res) => {
   res.status(ERROR_NOT_FOUND).send({ message: 'Что-то пошло как-то не так' });
 });
 
-app.listen(3002, () => {
+app.listen(3000, () => {
   // eslint-disable-next-line no-console
-  console.log('listen port 3002');
+  console.log('listen port 3000');
 });
