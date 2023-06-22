@@ -1,58 +1,61 @@
+/* eslint-disable import/no-extraneous-dependencies */
+const bcrypt = require('bcryptjs');
+const jsonWedToken = require('jsonwebtoken');
 const User = require('../models/user');
-const {
-  ERROR_INVALID_DATA,
-  ERROR_NOT_FOUND,
-  ERROR_DEFAULT,
-} = require('../erorrs/erorrs');
+const { ERROR_CODE_UNIQUE, JWT_SECRET, STATUS_OK } = require('../utils/constans');
 
-const STATUS_OK = 200;
+const NotFoundError = require('../erorrs/notFoundError');
+const InvalidDataError = require('../erorrs/invalidDataErorr');
+const NotUniqueData = require('../erorrs/notUniqueDataError');
 
-const getUsers = (req, res) => {
+const getUsers = (req, res, next) => {
   User.find({})
     .then((users) => res.status(STATUS_OK).send(users))
-    .catch(() => res.status(ERROR_DEFAULT).send(
-      { message: 'Произошла ошибка на сервере' },
-    ));
+    .catch(next);
 };
 
-const getUserById = (req, res) => {
-  User.findById(req.params.id)
-    .orFail(new Error('NotFound'))
+const getUserById = (req, res, next) => {
+  User.findById(req.params.userId)
+    .orFail(new NotFoundError('Пользователь не найден'))
     .then((user) => res.status(STATUS_OK).send(user))
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        res.status(ERROR_INVALID_DATA).send({ message: 'Переданы некорректные данные для запроса пользователя' });
-      } else if (err.message === 'NotFound') {
-        res.status(ERROR_NOT_FOUND).send({
-          message: 'Пользователь по указонному id не найден',
-        });
-      } else {
-        res.status(ERROR_DEFAULT)
-          .send({ message: 'Произошла ошибка на сервере' });
-      }
-    });
+    .catch(next);
 };
 
-const createUser = (req, res) => {
-  User.create(req.body)
-    .then((user) => res.status(STATUS_OK).send(user))
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
-        res.status(ERROR_INVALID_DATA)
-          .send({ message: 'Переданы некорректные данные' });
-      } else {
-        res.status(ERROR_DEFAULT).send({ message: 'Произошла ошибка на сервере' });
-      }
-    });
+const getCurrentUser = (req, res, next) => {
+  User.findById(req.user)
+    .orFail(new NotFoundError('Пользователь не найден'))
+    .then((user) => res.send({ user }))
+    .catch(next);
 };
 
-const updateUserProfile = (req, res) => {
-  const { name, about } = req.body;
+const createUser = (req, res, next) => {
+  const {
+    name, about, avatar, email, password,
+  } = req.body;
+  bcrypt.hash(password, 10).then((hashedPassword) => {
+    User.create({
+      name, about, avatar, email, password: hashedPassword,
+    })
+      .then((user) => res.status(STATUS_OK).send(user))
+      .catch((err) => {
+        if (err.code === ERROR_CODE_UNIQUE) {
+          next(new NotUniqueData('Такая почта уже зарегестрированна '));
+        } else if (err.name === 'ValidationError') {
+          next(new InvalidDataError('Переданы некорректные данные'));
+        } else {
+          next(err);
+        }
+      });
+  });
+};
+
+const updateUserProfile = (req, res, next) => {
+  const { name, about, email } = req.body;
   const { _id } = req.user;
 
   User.findByIdAndUpdate(
     _id,
-    { name, about },
+    { name, about, email },
     {
       new: true,
       runValidators: true,
@@ -61,18 +64,14 @@ const updateUserProfile = (req, res) => {
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res
-          .status(ERROR_INVALID_DATA)
-          .send({
-            message: 'Переданы некорректные данные пользователя',
-          });
+        next(new InvalidDataError('Переданы некорректные данные'));
       } else {
-        res.status(ERROR_DEFAULT).send({ message: 'Произошла ошибка на сервере' });
+        next(err);
       }
     });
 };
 
-const updateUserAvatar = (req, res) => {
+const updateUserAvatar = (req, res, next) => {
   const { avatar } = req.body;
   const { _id } = req.user;
 
@@ -87,15 +86,27 @@ const updateUserAvatar = (req, res) => {
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res
-          .status(ERROR_INVALID_DATA)
-          .send({
-            message: 'Переданы некорректные данные пользователя',
-          });
+        next(new InvalidDataError('Переданы некорректные данные'));
       } else {
-        res.status(ERROR_DEFAULT).send({ message: 'Произошла ошибка на сервере' });
+        next(err);
       }
     });
+};
+
+const login = (req, res, next) => {
+  const { email, password } = req.body;
+
+  User.findUserByIdentity(email, password)
+    .then((user) => {
+      const jwt = jsonWedToken.sign(
+        { _id: user._id },
+        JWT_SECRET,
+        { expiresIn: '7d' },
+      );
+      res.cookie('jwt', jwt, { maxAge: 3600000 * 24 * 7, httpOnly: true })
+        .send({ message: 'Авторизация прошла успешно' });
+    })
+    .catch(next);
 };
 
 module.exports = {
@@ -104,4 +115,6 @@ module.exports = {
   createUser,
   updateUserProfile,
   updateUserAvatar,
+  login,
+  getCurrentUser,
 };

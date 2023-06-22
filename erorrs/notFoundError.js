@@ -1,6 +1,4 @@
-const ERROR_INVALID_DATA = 400;
-const ERROR_NOT_FOUND = 404;
-const ERROR_DEFAULT = 500;
+const ERROR_NOT_FOUND = require('../utils/constans');
 
 class NotFoundError extends Error {
   constructor(message) {
@@ -11,9 +9,3 @@ class NotFoundError extends Error {
 }
 
 module.exports = NotFoundError;
-
-module.exports = {
-  ERROR_INVALID_DATA,
-  ERROR_NOT_FOUND,
-  ERROR_DEFAULT,
-};
