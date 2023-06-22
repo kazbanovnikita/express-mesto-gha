@@ -18,7 +18,7 @@ app.use(router);
 app.use(errors());
 app.use(defaultError);
 
-app.listen(3010, () => {
+app.listen(3000, () => {
   // eslint-disable-next-line no-console
-  console.log('listen port 3010');
+  console.log('listen port 3000');
 });
