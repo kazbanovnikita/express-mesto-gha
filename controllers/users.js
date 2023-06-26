@@ -1,6 +1,4 @@
-/* eslint-disable no-unused-vars */
 /* eslint-disable import/no-extraneous-dependencies */
-const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const jsonWedToken = require('jsonwebtoken');
 const User = require('../models/user');
@@ -18,7 +16,7 @@ const getUsers = (req, res, next) => {
 
 const getUserById = (req, res, next) => {
   User.findById(req.params.userId)
-    .orFail(new NotFoundError('Пользователь не найден'))
+    .orFail(() => new NotFoundError('Пользователь не найден'))
     .then((user) => res.status(STATUS_OK).send(user))
     .catch(next);
 };
