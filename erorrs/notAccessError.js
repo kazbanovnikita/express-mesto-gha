@@ -1,6 +1,6 @@
 const { ERROR_ACCESS } = require('../utils/constans');
 
-class NotAccess extends Error {
+class NotAccessError extends Error {
   constructor(message) {
     super(message);
     this.statusCode = ERROR_ACCESS;
@@ -8,4 +8,4 @@ class NotAccess extends Error {
   }
 }
 
-module.exports = NotAccess;
+module.exports = NotAccessError;

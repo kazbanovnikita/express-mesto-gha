@@ -1,4 +1,6 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable import/no-extraneous-dependencies */
+const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const jsonWedToken = require('jsonwebtoken');
 const User = require('../models/user');
