@@ -2,7 +2,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cookieParser = require('cookie-parser');
-const { errors } = require('celebrate');
+const errors = require('celebrate');
 const defaultError = require('./middlewares/defaultError');
 const router = require('./routes');
 
