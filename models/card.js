@@ -1,4 +1,6 @@
+/* eslint-disable import/no-extraneous-dependencies */
 const mongoose = require('mongoose');
+const validator = require('validator');
 
 const cardSchema = new mongoose.Schema({
   name: {
@@ -9,6 +11,10 @@ const cardSchema = new mongoose.Schema({
   },
   link: {
     type: String,
+    validate: {
+      validator: (val) => validator.isURL(val),
+      message: 'Введен некорректный URL',
+    },
     required: true,
   },
   owner: {

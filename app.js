@@ -18,7 +18,9 @@ app.use(router);
 app.use(errors());
 app.use(defaultError);
 
-app.listen(3000, () => {
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
   // eslint-disable-next-line no-console
-  console.log('listen port 3000');
+  console.log(`listen port ${PORT}`);
 });
