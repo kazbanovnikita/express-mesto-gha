@@ -1,3 +1,4 @@
+/* eslint-disable import/no-unresolved */
 /* eslint-disable import/no-extraneous-dependencies */
 const bcrypt = require('bcryptjs');
 const jsonWedToken = require('jsonwebtoken');
@@ -6,7 +7,7 @@ const { ERROR_CODE_UNIQUE, JWT_SECRET, STATUS_OK } = require('../utils/constans'
 
 const NotFoundError = require('../erorrs/notFoundError');
 const InvalidDataError = require('../erorrs/invalidDataErorr');
-const NotUniqueData = require('../erorrs/notUniqueDataError');
+const NotUniqueData = require('../erorrs/NotUniqueDataError');
 
 const getUsers = (req, res, next) => {
   User.find({})
@@ -16,7 +17,7 @@ const getUsers = (req, res, next) => {
 
 const getUserById = (req, res, next) => {
   User.findById(req.params.userId)
-    .orFail(() => new NotFoundError('Пользователь не найден'))
+    .orFail(new NotFoundError('Пользователь не найден'))
     .then((user) => res.status(STATUS_OK).send(user))
     .catch(next);
 };
