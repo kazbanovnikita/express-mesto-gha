@@ -2,7 +2,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cookieParser = require('cookie-parser');
-const errors = require('celebrate');
+const { errors } = require('celebrate');
 const defaultError = require('./middlewares/defaultError');
 const router = require('./routes');
 
@@ -18,7 +18,7 @@ app.use(router);
 app.use(errors());
 app.use(defaultError);
 
-app.listen(3000, () => {
+app.listen(3030, () => {
   // eslint-disable-next-line no-console
-  console.log('listen port 3000');
+  console.log('listen port 3030');
 });
